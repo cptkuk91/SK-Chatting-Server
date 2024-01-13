@@ -2,6 +2,7 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
+  // models 필드가 있어야 한다.
   name: String,
   email: String,
 });
