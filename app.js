@@ -44,7 +44,7 @@ app.use("/api/chat", chatRoutes);
 
 // Socket.IO 설정
 io.on("connection", (socket) => {
-  console.log("a user connected: " + socket.id);
+  console.log("연결 된 socket.id: " + socket.id);
 
   socket.on("identify", (userId) => {
     socket.join(userId);
