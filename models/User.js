@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
   // models 필드가 있어야 한다.
+  // 아이디, 패스워드, 중복검사 정도만..
   name: String,
   email: String,
 });
