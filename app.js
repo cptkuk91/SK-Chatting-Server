@@ -44,21 +44,14 @@ app.use("/api/chat", chatRoutes);
 
 // Socket.IO 설정
 io.on("connection", (socket) => {
-  console.log("연결 된 socket.id: " + socket.id);
-
-  socket.on("identify", (userId) => {
-    socket.join(userId);
-  });
-
-  socket.on("send_message", (messageData) => {
-    const newMessage = new Chat(messageData);
-    newMessage.save().then(() => {
-      socket.to(messageData.receiver).emit("receive_message", messageData);
-    });
-  });
+  console.log("New client connected");
 
   socket.on("disconnect", () => {
-    console.log("user disconnected");
+    console.log("Client disconnected");
+  });
+
+  socket.on("chat message", (msg) => {
+    io.emit("chat message", msg);
   });
 });
 

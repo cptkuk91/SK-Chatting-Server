@@ -1,13 +1,32 @@
 const User = require("../models/User");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 exports.createUser = async (req, res) => {
   try {
-    const newUser = new User(req.body);
+    // 이메일 중복 검사
+    const existingUser = await User.findOne({ email: req.body.email });
+    if (existingUser) {
+      return res.status(400).send("이미 사용 중인 이메일입니다.");
+    }
+
+    // 비밀번호 암호화
+    const hashedPassword = await bcrypt.hash(req.body.password, 8);
+
+    // 새 사용자 객체 생성
+    const newUser = new User({
+      email: req.body.email,
+      password: hashedPassword, // 암호화된 비밀번호 저장
+    });
+
+    // 데이터베이스에 사용자 저장
     await newUser.save();
-    res.status(201).send(newUser);
+
+    // 응답으로 새로 생성된 사용자 정보 전송 (비밀번호 제외)
+    res.status(201).send({ user: newUser.email, id: newUser._id });
   } catch (error) {
-    res.status(400).send(error);
+    console.error("Error creating new user:", error);
+    res.status(500).send("회원 가입 중 오류가 발생했습니다.");
   }
 };
 
