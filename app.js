@@ -44,14 +44,36 @@ app.use("/api/chat", chatRoutes);
 
 // Socket.IO 설정
 io.on("connection", (socket) => {
-  console.log("New client connected");
+  console.log("A user connected");
 
-  socket.on("disconnect", () => {
-    console.log("Client disconnected");
+  // 클라이언트로부터 join_room 이벤트를 받았을 때 처리
+  socket.on("join_room", (roomId) => {
+    socket.join(roomId);
+    console.log(`User joined room: ${roomId}`);
   });
 
-  socket.on("chat message", (msg) => {
-    io.emit("chat message", msg);
+  // 메시지 수신 및 브로드캐스트 로직, async 키워드 추가
+  socket.on("send_message", async (data) => {
+    try {
+      const { roomId, message, sender } = data;
+      // 데이터베이스에 메시지 저장 로직 추가
+      const newMessage = new Chat({
+        roomId,
+        sender,
+        message,
+      });
+      await newMessage.save();
+
+      // 해당 채팅방의 모든 사용자에게 메시지 브로드캐스트
+      io.to(roomId).emit("receive_message", data);
+    } catch (error) {
+      console.error("Error saving message to database:", error);
+      // 오류 처리 로직을 추가할 수 있습니다.
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
   });
 });
 

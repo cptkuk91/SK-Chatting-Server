@@ -3,15 +3,11 @@ const mongoose = require("mongoose");
 const chatSchema = new mongoose.Schema({
   roomId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "ChatRoom", // 채팅방 모델을 참조
+    ref: "ChatRoom",
     required: true,
   },
+  // sender, receiver 나눌 필요가 없어서 sender로 합쳐버림
   sender: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  receiver: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
