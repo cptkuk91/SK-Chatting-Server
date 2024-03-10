@@ -52,7 +52,6 @@ io.on("connection", (socket) => {
     console.log(`User joined room: ${roomId}`);
   });
 
-  // 메시지 수신 및 브로드캐스트 로직, async 키워드 추가
   socket.on("send_message", async (data) => {
     try {
       const { roomId, message, sender } = data;
@@ -64,11 +63,9 @@ io.on("connection", (socket) => {
       });
       await newMessage.save();
 
-      // 해당 채팅방의 모든 사용자에게 메시지 브로드캐스트
       io.to(roomId).emit("receive_message", data);
     } catch (error) {
       console.error("Error saving message to database:", error);
-      // 오류 처리 로직을 추가할 수 있습니다.
     }
   });
 
