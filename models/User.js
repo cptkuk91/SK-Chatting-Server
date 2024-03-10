@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
   // 아이디, 패스워드, 중복검사 정도만..
   name: String,
   email: String,
+  password: String,
 });
 
 const User = mongoose.model("User", userSchema);

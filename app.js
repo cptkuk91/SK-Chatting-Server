@@ -44,21 +44,33 @@ app.use("/api/chat", chatRoutes);
 
 // Socket.IO 설정
 io.on("connection", (socket) => {
-  console.log("연결 된 socket.id: " + socket.id);
+  console.log("A user connected");
 
-  socket.on("identify", (userId) => {
-    socket.join(userId);
+  // 클라이언트로부터 join_room 이벤트를 받았을 때 처리
+  socket.on("join_room", (roomId) => {
+    socket.join(roomId);
+    console.log(`User joined room: ${roomId}`);
   });
 
-  socket.on("send_message", (messageData) => {
-    const newMessage = new Chat(messageData);
-    newMessage.save().then(() => {
-      socket.to(messageData.receiver).emit("receive_message", messageData);
-    });
+  socket.on("send_message", async (data) => {
+    try {
+      const { roomId, message, sender } = data;
+      // 데이터베이스에 메시지 저장 로직 추가
+      const newMessage = new Chat({
+        roomId,
+        sender,
+        message,
+      });
+      await newMessage.save();
+
+      io.to(roomId).emit("receive_message", data);
+    } catch (error) {
+      console.error("Error saving message to database:", error);
+    }
   });
 
   socket.on("disconnect", () => {
-    console.log("user disconnected");
+    console.log("User disconnected");
   });
 });
 
